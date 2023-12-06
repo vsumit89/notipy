@@ -1,0 +1,2 @@
+class EventManagerService:
+    pass
