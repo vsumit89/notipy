@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from utils.config import get_settings
 from fastapi.middleware.cors import CORSMiddleware
 import time
+from api.routes.v1.event_manager import events_manager_router
+
 
 settings = get_settings()
 
@@ -31,3 +33,4 @@ async def add_process_time_header(request, call_next):
     return response
 
 
+app.include_router(events_manager_router, tags=["events"])

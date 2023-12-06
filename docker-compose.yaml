@@ -1,0 +1,65 @@
+version: "3.7"
+
+services:
+  notipy-api:
+    ports:
+      - 8000:8000
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: >
+      /bin/sh -c "
+      poetry run uvicorn main:app --reload --host 0.0.0.0;
+      "
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    networks:
+      - notipy
+
+  mongodb:
+    image: mongo:4.4.0-rc7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - ./volumes/mongodb/:/data/db/
+    networks:
+      - notipy
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: poetry run celery -A worker.send_notification worker -l info
+    networks:
+      - notipy
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmquser
+      - RABBITMQ_DEFAULT_PASS=rabbitmqpassword
+      - RABBITMQ_DEFAULT_VHOST=notipy
+    volumes:
+      - ./volumes/rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+    networks:
+      - notipy
+
+networks:
+  notipy:

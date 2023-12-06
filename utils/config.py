@@ -26,6 +26,15 @@ class Settings(BaseSettings):
     CORS_METHODS: List[str] = ["*"]
     CORS_HEADERS: List[str] = ["Content-Type", "Authorization"]
 
+    # MESSAGING QUEUE CONFIG VARIABLES
+    MQ_HOST: str = "rabbitmq"
+    MQ_PORT: int = 5672
+    MQ_USERNAME: str = "rabbitmquser"
+    MQ_PASSWORD: str = "rabbitmqpassword"
+    MQ_VHOST: str = "notipy"
+
+    
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
