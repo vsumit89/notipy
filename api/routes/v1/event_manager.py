@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
 from worker.send_notification import send_notifications
+from app.services.event_manager import EventManagerService
 
 # events_manager_router is an APIRouter object which will be used to define all the routes related to events
 events_manager_router = APIRouter()
@@ -7,11 +9,15 @@ events_manager_router = APIRouter()
 
 # creates an event
 @events_manager_router.post("/events")
-async def create_event():
+async def create_event(event_service: EventManagerService = Depends()):
     """
     Create an event
     """
-    return {"message": "event created"}
+    try:
+        await event_service.create_event()
+        return {"message": "event successfully created"}
+    except Exception as e:
+        return {"message": "event not created"}
 
 
 @events_manager_router.get("/events")

@@ -1,2 +1,0 @@
-class EventManagerRepository:
-    pass

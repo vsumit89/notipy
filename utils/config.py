@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     PROJECT_DOCS_URL: str = "/docs"
 
     # DATABASE CONFIG VARIABLES
+    DB_HOST: str = "mongodb"
+    DB_PORT: int = 27017
+    DB_USERNAME: str = "root"
+    DB_PASSWORD: str = "password"
+    DB_NAME: str = "notipy"
+    DB_STORE: str = "mongodb"
 
     # CORS CONFIG VARIABLES
     CORS_ORIGINS: List[str] = ["*"]
@@ -32,8 +38,6 @@ class Settings(BaseSettings):
     MQ_USERNAME: str = "rabbitmquser"
     MQ_PASSWORD: str = "rabbitmqpassword"
     MQ_VHOST: str = "notipy"
-
-    
 
     class Config:
         env_file = ".env"

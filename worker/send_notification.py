@@ -40,7 +40,7 @@ class NotificationTask(Task):
 
 @celery_app.task(name="send_notification")
 def send_notifications():
-    return NotificationTask().run("sumit")
+    NotificationTask().run("sumit")
 
 
 celery_app.register_task(send_notifications)
