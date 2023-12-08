@@ -12,7 +12,7 @@ class EventManagerRepository(ABC):
         pass
 
     @abstractmethod
-    def get_events(self):
+    def get_events(self, limit, offset, query):
         pass
 
     @abstractmethod

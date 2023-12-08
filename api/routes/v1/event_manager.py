@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Response
 
-from worker.send_notification import send_notifications
 from app.services.event_manager import EventManagerService
 from app.dtos.event_manager import CreateEvent, CreateEventResponse
 
@@ -33,33 +32,78 @@ async def create_event(
 
 
 @events_manager_router.get("/events")
-async def get_events():
+async def get_events(
+    response: Response,
+    limit: int = 20,
+    offset: int = 0,
+    query: str = None,
+    event_service: EventManagerService = Depends(),
+):
     """
     Get all events
     """
-    send_notifications.apply_async()
-    return {"message": "all events fetched"}
+    try:
+        event_details = await event_service.get_events(limit, offset, query)
+        return event_details
+    except Exception as e:
+        response.status_code = 500
+        return {"message": str(e)}
 
 
 @events_manager_router.get("/events/{event_id}")
-async def get_event(event_id: int):
+async def get_event(
+    response: Response,
+    event_id: str,
+    event_service: EventManagerService = Depends(),
+):
     """
     Get an event
     """
-    return {"message": f"event {event_id} fetched"}
+    try:
+        event = await event_service.get_event_by_id(event_id)
+        return event
+    except Exception as e:
+        if str(e) == "event not found":
+            response.status_code = 404
+        else:
+            response.status_code = 500
+        return {"message": f"{str(e)}"}
 
 
 @events_manager_router.put("/events/{event_id}")
-async def update_event(event_id: int):
+async def update_event(
+    request_body: CreateEvent,
+    response: Response,
+    event_id: str,
+    event_service: EventManagerService = Depends(),
+):
     """
     Update an event
     """
-    return {"message": f"event {event_id} updated"}
+    try:
+        updated_event = await event_service.update_event(event_id, request_body)
+        return updated_event
+    except:
+        response.status_code = 500
+        return {"message": f"unable to update event {event_id}"}
 
 
 @events_manager_router.delete("/events/{event_id}")
-async def delete_event(event_id: int):
+async def delete_event(
+    response: Response, event_id: str, event_service: EventManagerService = Depends()
+):
     """
     Delete an event
     """
-    return {"message": f"event {event_id} deleted"}
+    try:
+        is_deleted = await event_service.delete_event(event_id)
+        if is_deleted:
+            return {"message": f"event deleted successfully"}
+        else:
+            raise Exception("unable to delete event")
+    except Exception as e:
+        if str(e) == "event not found":
+            response.status_code = 404
+        else:
+            response.status_code = 500
+        return {"message": f"{str(e)}"}

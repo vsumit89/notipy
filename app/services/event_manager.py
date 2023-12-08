@@ -18,4 +18,36 @@ class EventManagerService:
             return new_event
         except Exception as e:
             self.logger.error("error in creating an event", e)
-            raise Exception
+            raise Exception("unable to create event")
+
+    async def get_events(self, limit, offset, query):
+        try:
+            event_details = await self.repository.get_events(limit, offset, query)
+            return event_details
+        except Exception as e:
+            self.logger.error("error in fetching events", e)
+            raise Exception("Error while fetching events. Please try again later")
+
+    async def get_event_by_id(self, id):
+        try:
+            event = await self.repository.get_event(id)
+            return event
+        except Exception as e:
+            self.logger.error("error in fetching event", e)
+            raise e
+
+    async def update_event(self, id, event):
+        try:
+            updated_event = await self.repository.update_event(id, event)
+            return updated_event
+        except Exception as e:
+            self.logger.error("error in updating event", e)
+            raise Exception("Error while updating event. Please try again later")
+
+    async def delete_event(self, id):
+        try:
+            is_deleted = await self.repository.delete_event(id)
+            return is_deleted
+        except Exception as e:
+            self.logger.error("error in deleting event", str(e))
+            raise e
