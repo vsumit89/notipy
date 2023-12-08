@@ -35,7 +35,6 @@ class MongoEventManagerRepository(EventManagerRepository):
                 raise Exception("event not found")
             return event
         except Exception as e:
-            self.logger.error("error in fetching document")
             raise e
 
     # get_events returns a list of events and the total count based on the limit, offset and query
