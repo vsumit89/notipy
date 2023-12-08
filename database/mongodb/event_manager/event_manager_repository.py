@@ -1,8 +1,11 @@
 from app.repositories.event_manager.event_manager_repository import (
     EventManagerRepository,
 )
+
 from app.models.event_manager import Event
-from app.models.channels import EmailChannel
+from app.models.channels import EmailChannel, ChannelType, SMSChannel
+
+from app.dtos.event_manager import CreateEvent
 
 from utils.logger import CustomLogger
 
@@ -31,21 +34,32 @@ class MongoEventManagerRepository(EventManagerRepository):
         pass
         # return await self.db_service.client.find().to_list(1000)
 
-    async def create_event(self):
+    async def create_event(self, event: CreateEvent):
         try:
-            email_channel = EmailChannel(
-                no_of_attachments=2,
-                subject="some subject",
-                content="this is content",
-                is_html=False,
+            channels = {}
+
+            if "email" in event.channels:
+                channels["email"] = EmailChannel(
+                    no_of_attachments=event.channels["email"].no_of_attachments,
+                    subject=event.channels["email"].subject,
+                    content=event.channels["email"].content,
+                    is_html=event.channels["email"].is_html,
+                )
+
+            if "sms" in event.channels:
+                channels["sms"] = SMSChannel(
+                    content=event.channels["sms"].content,
+                )
+
+            new_event = Event(
+                name=event.name,
+                description=event.description,
+                channels=channels,
             )
 
-            event = Event(
-                name="this is name",
-                description="this is description",
-                channels={"email": email_channel},
-            )
-            await event.insert()
+            await new_event.insert()
+
+            return new_event
         except Exception as e:
             self.logger.error("error in inserting document", str(e))
 

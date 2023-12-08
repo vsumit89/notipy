@@ -53,4 +53,4 @@ async def add_process_time_header(request, call_next):
     return response
 
 
-app.include_router(events_manager_router, tags=["events"])
+app.include_router(events_manager_router, tags=["events"], prefix="/api/v1")

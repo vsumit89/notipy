@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from app.dtos.event_manager import CreateEvent
 
 
 # EventManagerRepository is a singleton class that is used to run crud operations on the event_manager collection
@@ -15,7 +16,7 @@ class EventManagerRepository(ABC):
         pass
 
     @abstractmethod
-    def create_event(self, event):
+    def create_event(self, event: CreateEvent):
         pass
 
     @abstractmethod

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from enum import Enum
 
 
 class EmailChannel(BaseModel):
@@ -13,5 +13,6 @@ class SMSChannel(BaseModel):
     content: str
 
 
-class Channels(BaseModel):
-    email: Optional[EmailChannel]
+class ChannelType(Enum):
+    EMAIL = "email"
+    SMS = "sms"
