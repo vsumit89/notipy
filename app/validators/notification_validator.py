@@ -13,7 +13,7 @@ class NotificationValidator:
     NUMBER_OF_ATTACHMENTS_MISMATCH = Exception("Number of attachments mismatch")
 
     @staticmethod
-    def validate(channel_type, channel_data, dynamic_data):
+    def validate(channel_type: ChannelType, channel_data, dynamic_data):
         match channel_type:
             case ChannelType.EMAIL:
                 return NotificationValidator._validate_email(channel_data, dynamic_data)
@@ -24,39 +24,52 @@ class NotificationValidator:
 
     @staticmethod
     def _validate_email(channel_data: EmailChannel, dynamic_data):
-        if not dynamic_data["to_email"]:
-            raise NotificationValidator.TO_EMAIL_NOT_PRESENT
+        try:
+            if "to_email" not in dynamic_data or not dynamic_data["to_email"]:
+                raise NotificationValidator.TO_EMAIL_NOT_PRESENT
 
-        if channel_data.no_of_attachments != len(dynamic_data["attachments"]):
-            raise NotificationValidator.NUMBER_OF_ATTACHMENTS_MISMATCH
+            if "attachments" in dynamic_data:
+                if len(dynamic_data["attachments"]) != channel_data.no_of_attachments:
+                    raise NotificationValidator.NUMBER_OF_ATTACHMENTS_MISMATCH
+            else:
+                if channel_data.no_of_attachments != 0:
+                    raise NotificationValidator.NUMBER_OF_ATTACHMENTS_MISMATCH
 
-        if channel_data.is_html:
-            template_env = Environment(loader=BaseLoader())
-            try:
-                template = template_env.from_string(channel_data.content)
-                template.placeholders = set(
-                    re.findall(r"{{\s*(\w+)\s*}}", channel_data.content)
+            if channel_data.is_html:
+                template_env = Environment(loader=BaseLoader())
+                try:
+                    template = template_env.from_string(channel_data.content)
+                    template.placeholders = set(
+                        re.findall(r"{{\s*(\w+)\s*}}", channel_data.content)
+                    )
+                except TemplateSyntaxError:
+                    template.placeholders = set()
+
+                if "metadata" not in dynamic_data and len(template.placeholders) > 0:
+                    raise Exception("metadata is required")
+
+                missing_fields = template.placeholders - set(
+                    dynamic_data["metadata"].keys()
                 )
-            except TemplateSyntaxError:
-                template.placeholders = set()
+                if missing_fields:
+                    raise Exception(
+                        f"Missing fields in metadata: {', '.join(missing_fields)}"
+                    )
+            else:
+                template = Template(channel_data.content)
+                missing_fields = [
+                    key
+                    for key in template.keys()
+                    if key not in dynamic_data["metadata"]
+                ]
 
-            missing_fields = template.placeholders - set(dynamic_data.metadata.keys())
-            if missing_fields:
-                raise Exception(
-                    f"Missing fields in metadata: {', '.join(missing_fields)}"
-                )
-        else:
-            template = Template(channel_data.content)
-            missing_fields = [
-                key for key in template.keys() if key not in dynamic_data.metadata
-            ]
+                if missing_fields:
+                    raise Exception(
+                        f"Missing fields in metadata: {', '.join(missing_fields)}"
+                    )
 
-            if missing_fields:
-                raise Exception(
-                    f"Missing fields in metadata: {', '.join(missing_fields)}"
-                )
-
-        return True
+        except Exception as e:
+            raise e
 
     @staticmethod
     def _validate_sms(channel_data: SMSChannel, dynamic_data):

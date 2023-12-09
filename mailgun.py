@@ -42,7 +42,7 @@ def send_simple_message(html_content):
         f"https://api.mailgun.net/v3/{domain}/messages",
         auth=("api", f"{api_key}"),
         data={
-            "from": f"Excited User <mailgun@{domain}>",
+            "from": f"Sumit Vishwakarma <vsumit030201@gmail.com>",
             "to": ["vsumit030201@gmail.com"],
             "subject": "Hello",
             "html": html_content,

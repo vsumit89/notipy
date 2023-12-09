@@ -1,4 +1,4 @@
-from notifications.email import EmailNotificationService
+from app.external.notifications.email import EmailNotificationService
 from notifications.sms import SMSNotificationService
 
 

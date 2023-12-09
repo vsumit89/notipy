@@ -10,7 +10,6 @@ class Shipment:
         is_html,
         email_content,
         no_of_attachments,
-        sms_content,
     ):
         self.name = name
         self.description = description
@@ -20,24 +19,22 @@ class Shipment:
             "content": email_content,
             "no_of_attachments": no_of_attachments,
         }
-        self.sms = {"content": sms_content}
 
     def to_json(self):
         return {
             "name": self.name,
             "description": self.description,
-            "channels": {"email": self.email, "sms": self.sms},
+            "channels": {"email": self.email},
         }
 
 
 # Example usage:
 shipment_data = {
-    "name": "CREATE SHIPMENT",
-    "description": "This creates a shipment",
-    "email_subject": "Shipment Successfully Booked",
+    "name": "FORGOT PASSWORD",
+    "description": "this is used for forgot password",
+    "email_subject": "Please reset your password",
     "is_html": True,
-    "no_of_attachments": 2,
-    "sms_content": "send this text to everyone",
+    "no_of_attachments": 0,
 }
 
 shipment_data[
@@ -46,92 +43,55 @@ shipment_data[
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #fff;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
 
-    h1 {
-      color: #333;
-    }
+        h2 {
+            color: #333;
+        }
 
-    p {
-      color: #666;
-    }
+        p {
+            color: #666;
+        }
 
-    .tracking-info {
-      margin-top: 20px;
-    }
-
-    .tracking-info table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    .tracking-info table th,
-    .tracking-info table td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .tracking-number {
-      font-weight: bold;
-    }
-
-    .footer {
-      margin-top: 20px;
-      color: #888;
-      text-align: center;
-    }
-  </style>
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            text-decoration: none;
+            background-color: #007BFF;
+            color: #fff;
+            border-radius: 3px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Shipping Information</h1>
-    <p>Hello {{ customer_name }},</p>
-
-    <div class="tracking-info">
-      <p>Your order has been shipped! Here are the details:</p>
-
-      <table>
-        <tr>
-          <th>Order ID</th>
-          <td>{{order_id}}</td>
-        </tr>
-        <tr>
-          <th>Shipping Date</th>
-          <td>{{shipping_date}}</td>
-        </tr>
-        <tr>
-          <th>Estimated Delivery Date</th>
-          <td>{{estimated_delivery_date}}</td>
-        </tr>
-        <tr>
-          <th>Tracking Number</th>
-          <td class="tracking-number">{{tracking_number}}</td>
-        </tr>
-      </table>
+    <div class="container">
+        <h2>Password Reset</h2>
+        <p>Dear {{ user }},</p>
+        <p>We received a request to reset your password for {{ platform }}. To proceed with the password reset, please click the button below:</p>
+        <a class="button" href="{{ reset_link }}">Reset Password</a>
+        <p>If you did not request a password reset, please ignore this email. Your account security is important to us.</p>
+        <p>Thank you for using {{ platform }}.</p>
+        <p>Best regards,<br>{{ your_name }}<br>{{ your_company }}</p>
     </div>
-
-    <div class="footer">
-      <p>Thank you for choosing us!</p>
-    </div>
-  </div>
 </body>
 </html>
 """
