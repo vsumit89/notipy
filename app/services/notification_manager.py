@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Any
 
 from app.models.channels import EmailChannel, SMSChannel, ChannelType
 from app.repositories.notification.notifications_factory import (
@@ -29,7 +29,7 @@ class NotificationManagerService:
         settings = get_settings()
         self.repository = get_notifications_repository(settings.DB_STORE)
 
-    async def validate_metadata(self, dynamic_data: Dict[str, str]) -> bool:
+    async def validate_metadata(self, dynamic_data: Dict[str, Any]) -> bool:
         """
         Validates the metadata sent with the event
         :param metadata: metadata sent with the event

@@ -2,7 +2,7 @@ import requests
 from pydantic import BaseModel
 from jinja2 import BaseLoader, Environment, Template
 
-from typing import List
+from typing import List, Any
 from .notification import NotificationService
 from utils.config import get_settings
 
@@ -12,6 +12,7 @@ class EmailData(BaseModel):
     subject: str
     is_html: bool
     content: str
+    attachments: List[Any]
 
 
 class EmailNotificationService(NotificationService):
@@ -48,6 +49,7 @@ class EmailNotificationService(NotificationService):
                 url=url,
                 auth=("api", settings.EMAIL_API_KEY),
                 data=data,
+                files=email_data.attachments,
             )
 
             if data.status_code == 200:

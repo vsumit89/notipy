@@ -3,11 +3,14 @@ from celery.utils.log import get_task_logger
 import asyncio
 
 from utils.config import get_settings
-from app.models.channels import ChannelType, EmailChannel, SMSChannel
+from utils.file import process_urls
+
+from app.models.channels import ChannelType, EmailChannel
 from app.models.notifications import NotificationStatus
 
 from app.external.notifications.notification_factory import get_notification_service
 from app.external.notifications.email import EmailData
+
 from app.repositories.db_factory import getDB
 from app.repositories.notification.notifications_factory import (
     get_notifications_repository,
@@ -40,17 +43,6 @@ async def update_notification_status(notification_id: str, status: str):
 
 
 class NotificationTask(Task):
-    max_retries = 3
-    default_retry_delay = 10
-
-    def on_retry(self, exc, task_id, args, kwargs, einfo):
-        logger.info("Retrying task: --->>>> ")
-        return
-
-    def on_failure(self, exc, task_id, args, kwargs, einfo):
-        logger.info("Task failed: --->>>> ")
-        return
-
     def run(
         self,
         notification_id: str,
@@ -59,6 +51,7 @@ class NotificationTask(Task):
         dynamic_data: dict,
     ):
         try:
+            print("this is data", dynamic_data)
             channel_data = EmailChannel(
                 **channel_data,
             )
@@ -72,12 +65,17 @@ class NotificationTask(Task):
                         dynamic_data["metadata"],
                         channel_data.is_html,
                     )
+
+                    files = asyncio.run(process_urls(dynamic_data["attachments"]))
+
                     notification_data = EmailData(
-                        to_email=[dynamic_data["to_email"]],
+                        to_email=dynamic_data["to_email"],
                         subject=channel_data.subject,
                         content=content,
                         is_html=channel_data.is_html,
+                        attachments=files,
                     )
+
                 case ChannelType.SMS.value:
                     raise NotImplementedError(
                         f"channel type {channel_type} is not implemented"
@@ -120,6 +118,7 @@ def send_notifications(
     channel_data: dict,
     dynamic_data: dict,
 ):
+    print("in the task", dynamic_data)
     NotificationTask().run(
         notification_id=notification_id,
         channel_type=channel_type,

@@ -122,7 +122,7 @@ async def send_notifications(
     """
     try:
         await event_service.initiate_notifications(event_id, requestBody)
-        # return {"message": "notifications initiated successfully"}
+        return {"message": "notification has been queued successfully for delivery"}
     except Exception as e:
         response.status_code = 422
         return {"message": f"{str(e)}"}

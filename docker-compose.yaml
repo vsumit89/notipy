@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  ########################################################################
+  ####                     API SERVICE                                ####
+  ########################################################################
   notipy-api:
     ports:
       - 8000:8000
@@ -18,6 +21,9 @@ services:
     networks:
       - notipy
 
+  ########################################################################
+  ####                    DATABASE SERVICE                            ####
+  ########################################################################
   mongodb:
     image: mongo:4.4.0-rc7
     environment:
@@ -30,6 +36,9 @@ services:
     networks:
       - notipy
 
+  ########################################################################
+  ####                     WORKER SERVICE                             ####
+  ########################################################################
   celery:
     build:
       context: .
@@ -42,6 +51,9 @@ services:
     networks:
       - notipy
 
+  ########################################################################
+  ####                     MESSAGE QUEUE SERVICE                      ####
+  #######################################################################
   rabbitmq:
     image: "rabbitmq:3-management"
     environment:
@@ -58,6 +70,39 @@ services:
       interval: 5s
       timeout: 15s
       retries: 5
+    networks:
+      - notipy
+
+  ########################################################################
+  ####                     BUCKET SERVICE                        #######
+  #######################################################################
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: password
+    volumes:
+      - ./volumes/minio/data:/export
+      - ./volumes/minio/config:/root/.minio
+    command: server --console-address :9001 /export
+    networks:
+      - notipy
+
+  createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      apk add --no-cache bash;
+      /usr/bin/mc config host add myminio http://minio:9000 minio password;
+      /usr/bin/mc mb myminio/attachments;
+      /usr/bin/mc anonymous set public myminio/attachments;
+      exit 0;
+      "
     networks:
       - notipy
 
