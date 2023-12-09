@@ -1,4 +1,4 @@
-from jinja2 import Environment, BaseLoader, TemplateSyntaxError, Template
+from jinja2 import Environment, BaseLoader, TemplateSyntaxError, meta
 import re
 
 from app.models.channels import ChannelType, EmailChannel, SMSChannel
@@ -56,11 +56,15 @@ class NotificationValidator:
                         f"Missing fields in metadata: {', '.join(missing_fields)}"
                     )
             else:
-                template = Template(channel_data.content)
+                env = Environment()
+                # Parse the template to extract variable names
+                parsed_content = env.parse(channel_data.content)
+                template_variables = meta.find_undeclared_variables(parsed_content)
+
                 missing_fields = [
-                    key
-                    for key in template.keys()
-                    if key not in dynamic_data["metadata"]
+                    variable
+                    for variable in template_variables
+                    if variable not in dynamic_data["metadata"]
                 ]
 
                 if missing_fields:
