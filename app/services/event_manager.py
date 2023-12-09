@@ -55,6 +55,7 @@ class EventManagerService:
     async def initiate_notifications(self, event_id, metadata):
         try:
             event = await self.repository.get_event(event_id)
+            print(event)
         except Exception as e:
             self.logger.error("error in fetching event", e)
             raise e

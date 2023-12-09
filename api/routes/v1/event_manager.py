@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Response
+from typing import Dict, Any
 
 from app.services.event_manager import EventManagerService
 from app.dtos.event_manager import CreateEvent, CreateEventResponse
@@ -111,12 +112,15 @@ async def delete_event(
 
 @events_manager_router.post("/events/{event_id}/send_notifications")
 async def send_notifications(
-    response: Response, event_id: str, event_service: EventManagerService = Depends()
+    requestBody: Dict[str, Any],
+    response: Response,
+    event_id: str,
+    event_service: EventManagerService = Depends(),
 ):
     """
     Publish an event
     """
     try:
-        pass
+        await event_service.initiate_notifications(event_id, requestBody)
     except Exception as e:
         pass
