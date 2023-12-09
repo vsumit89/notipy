@@ -107,3 +107,16 @@ async def delete_event(
         else:
             response.status_code = 500
         return {"message": f"{str(e)}"}
+
+
+@events_manager_router.post("/events/{event_id}/send_notifications")
+async def send_notifications(
+    response: Response, event_id: str, event_service: EventManagerService = Depends()
+):
+    """
+    Publish an event
+    """
+    try:
+        pass
+    except Exception as e:
+        pass

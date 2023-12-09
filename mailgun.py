@@ -173,4 +173,3 @@ rendered_template = template.render(dynamic_data)
 value = send_simple_message(rendered_template)
 
 print(value.text)
- 

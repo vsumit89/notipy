@@ -51,3 +51,12 @@ class EventManagerService:
         except Exception as e:
             self.logger.error("error in deleting event", str(e))
             raise e
+
+    async def initiate_notifications(self, event_id, metadata):
+        try:
+            event = await self.repository.get_event(event_id)
+        except Exception as e:
+            self.logger.error("error in fetching event", e)
+            raise e
+
+        pass
