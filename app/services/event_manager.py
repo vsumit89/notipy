@@ -2,6 +2,9 @@ from app.repositories.event_manager.event_manager_factory import (
     get_event_manager_repository,
 )
 from app.dtos.event_manager import CreateEvent
+
+from app.services.notification_manager import NotificationManagerService
+
 from utils.logger import CustomLogger
 from utils.config import get_settings
 
@@ -50,4 +53,15 @@ class EventManagerService:
             return is_deleted
         except Exception as e:
             self.logger.error("error in deleting event", str(e))
+            raise e
+
+    async def initiate_notifications(self, event_id, dynamic_data):
+        try:
+            event = await self.repository.get_event(event_id)
+
+            notification_manager = NotificationManagerService(event.channels)
+            await notification_manager.validate_metadata(dynamic_data)
+            await notification_manager.send_notifications(event_id, dynamic_data)
+
+        except Exception as e:
             raise e

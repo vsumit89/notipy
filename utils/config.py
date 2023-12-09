@@ -39,6 +39,13 @@ class Settings(BaseSettings):
     MQ_PASSWORD: str = "rabbitmqpassword"
     MQ_VHOST: str = "notipy"
 
+    # EMAIL SERVICE CONFIG VARIABLES
+    EMAIL_SERVICE_API_URL: str = "https://api.mailgun.net/v3"
+    EMAIL_DOMAIN: str = "sandboxf025f1c5362f47f39394e138b9a67081.mailgun.org"
+    EMAIL_API_KEY: str = "b12fc7ca061fd71b92da9e028d293b3f-0a688b4a-3679d9ea"
+    EMAIL_NAME: str = "Sumit Vishwakarma"
+    EMAIL_FROM: str = "vsumit030201@gmail.com"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

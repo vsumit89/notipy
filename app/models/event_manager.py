@@ -1,10 +1,16 @@
 from beanie import Document
-from app.models.channels import EmailChannel, SMSChannel, ChannelType
 from typing import Optional, Dict, Union
-from .timestamp import Base
+from datetime import datetime
+from pydantic import Field
 
 
-class Event(Document, Base):
+from app.models.channels import EmailChannel, SMSChannel, ChannelType
+
+
+class Event(Document):
+    created_at: int = Field(default_factory=lambda: int(datetime.utcnow().timestamp()))
+    updated_at: int = Field(default_factory=lambda: int(datetime.utcnow().timestamp()))
+    deleted_at: Optional[datetime] = None
     name: str
     description: str
     channels: Optional[Dict[str, Union[EmailChannel, SMSChannel]]] = None

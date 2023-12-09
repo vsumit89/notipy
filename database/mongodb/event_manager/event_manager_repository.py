@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Dict
+
 from app.repositories.event_manager.event_manager_repository import (
     EventManagerRepository,
 )
@@ -31,7 +32,9 @@ class MongoEventManagerRepository(EventManagerRepository):
     async def get_event(self, id):
         try:
             event = await Event.get(id)
-            if event.deleted_at is not None:
+            # if event is None:
+            #     raise Exception("event not found")
+            if event is None or event.deleted_at is not None:
                 raise Exception("event not found")
             return event
         except Exception as e:

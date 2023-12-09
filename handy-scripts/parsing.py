@@ -1,4 +1,4 @@
-from jinja2 import Environment, BaseLoader, TemplateSyntaxError
+from jinja2 import Environment, BaseLoader, TemplateSyntaxError, Template
 import re
 
 # Your HTML template as a string
