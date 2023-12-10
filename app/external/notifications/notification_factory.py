@@ -1,5 +1,5 @@
 from app.external.notifications.email import EmailNotificationService
-from notifications.sms import SMSNotificationService
+from app.external.notifications.sms import SMSNotificationService
 
 
 def get_notification_service(type):
