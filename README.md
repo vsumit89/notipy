@@ -25,4 +25,24 @@ A multichannel notification system built using FastAPI where users can create ev
 - **Notification Dispatch**: Celery Worker listens for events from RabbitMQ and, upon receiving them, sends the notifications across the designated channels.
 - **Notification Status Tracking**: The Celery Worker updates the status of the notification in MongoDB, indicating whether the notification was successfully sent or not. This status can be used by the Notipy API to resend the notification if required.
 
+## Setup
 
+### Prerequisites
+
+- Docker, Docker Compose
+
+### Steps
+
+- Clone the repository using `git clone https://github.com/vsumit/wareiq-assg`
+- Navigate to the project directory using `cd wareiq-assg`
+- Run `docker-compose up --build` to build and run the containers
+- The API will be available at `http://localhost:8000`
+- The documentation will be available at `http://localhost:8000/docs`
+
+## Handy Commands from Makefile
+
+- `make build-and-run`: Build and run the containers
+- `make build`: Build the containers
+- `make run`: Run the containers
+- `make stop`: Stop the containers
+- `make clean`: Stop and remove the containers

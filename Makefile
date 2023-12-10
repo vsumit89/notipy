@@ -1,8 +1,10 @@
-docker-build:
+build:
 	docker compose build
-docker-build-and-run:
+build-and-run:
 	docker compose up --build
-docker-down:
+stop:
+	docker compose stop
+clean:
 	docker compose down
-docker-up:
+run:
 	docker compose up
