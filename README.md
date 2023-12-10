@@ -6,7 +6,7 @@ A multichannel notification system built using FastAPI where users can create ev
 
 <!-- add an image -->
 
-![Architecture Overview](./images/notification-channels.jpeg)
+![Architecture Overview](./images/architecture-diagram.jpeg)
 
 ### Components
 
