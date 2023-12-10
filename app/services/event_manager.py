@@ -6,7 +6,10 @@ from app.repositories.notification.notifications_factory import (
 )
 
 from app.dtos.event_manager import CreateEvent, GetNotificationsResponse
+
 from app.models.notifications import NotificationStatus, Notification
+from app.models.exception import AppException
+
 from app.services.notification_manager import NotificationManagerService
 
 from utils.logger import CustomLogger
@@ -24,40 +27,35 @@ class EventManagerService:
         try:
             new_event = await self.repository.create_event(event=event)
             return new_event
-        except Exception as e:
-            self.logger.error("error in creating an event", e)
-            raise Exception("unable to create event")
+        except AppException as e:
+            raise e
 
     async def get_events(self, limit, offset, query):
         try:
             event_details = await self.repository.get_events(limit, offset, query)
             return event_details
-        except Exception as e:
-            self.logger.error("error in fetching events", e)
-            raise Exception("Error while fetching events. Please try again later")
+        except AppException as e:
+            raise e
 
     async def get_event_by_id(self, id):
         try:
             event = await self.repository.get_event(id)
             return event
-        except Exception as e:
-            self.logger.error("error in fetching event", e)
+        except AppException as e:
             raise e
 
     async def update_event(self, id, event):
         try:
             updated_event = await self.repository.update_event(id, event)
             return updated_event
-        except Exception as e:
-            self.logger.error("error in updating event", e)
-            raise Exception("Error while updating event. Please try again later")
+        except AppException as e:
+            raise e
 
     async def delete_event(self, id):
         try:
             is_deleted = await self.repository.delete_event(id)
             return is_deleted
-        except Exception as e:
-            self.logger.error("error in deleting event", str(e))
+        except AppException as e:
             raise e
 
     async def initiate_notifications(self, event_id, dynamic_data):
@@ -65,10 +63,12 @@ class EventManagerService:
             event = await self.repository.get_event(event_id)
 
             notification_manager = NotificationManagerService(event.channels)
+
             await notification_manager.validate_metadata(dynamic_data)
+
             await notification_manager.send_notifications(event_id, dynamic_data)
 
-        except Exception as e:
+        except AppException as e:
             raise e
 
     async def get_notifications(
@@ -78,15 +78,18 @@ class EventManagerService:
         offset: int,
         status: NotificationStatus | None,
     ) -> GetNotificationsResponse:
-        notification_details = await self.notification_repository.get_notifications(
-            event_id=event_id, limit=limit, offset=offset, status=status
-        )
-        return notification_details
+        try:
+            notification_details = await self.notification_repository.get_notifications(
+                event_id=event_id, limit=limit, offset=offset, status=status
+            )
+            return notification_details
+        except AppException as e:
+            raise e
 
     async def get_notification(self, id) -> Notification:
         try:
             notification = await self.notification_repository.get_notification(id)
             return notification
-        except Exception as e:
+        except AppException as e:
             self.logger.error("error in fetching notification")
             raise e

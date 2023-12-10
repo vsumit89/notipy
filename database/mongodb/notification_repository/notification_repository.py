@@ -4,7 +4,7 @@ from app.repositories.notification.notifications_repository import (
     NotificationsRepository,
 )
 from app.dtos.event_manager import GetNotificationsResponse
-from typing import List
+from app.models.exception import AppException
 from pymongo import DESCENDING
 
 
@@ -60,14 +60,24 @@ class MongoNotificationRepository(NotificationsRepository):
                 .to_list()
             )
             return GetNotificationsResponse(total=count, notifications=notifications)
-        except Exception as e:
+        except AppException as e:
             raise e
 
     async def get_notification(self, id) -> Notification:
         try:
             notification = await Notification.get(id)
             if notification is None:
-                raise Exception("notification not found")
+                raise AppException(
+                    status_code=404,
+                    message="notification not found",
+                    detail="notification_id provided is not valid. Please try again with a valid notification_id",
+                )
             return notification
-        except Exception as e:
+        except ValueError as e:
+            raise AppException(
+                status_code=422,
+                message="notification_id provided is not valid",
+                detail="notification_id provided is not valid. Please try again with a valid notification_id",
+            )
+        except AppException as e:
             raise e

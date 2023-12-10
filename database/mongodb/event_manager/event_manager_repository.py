@@ -7,7 +7,7 @@ from app.repositories.event_manager.event_manager_repository import (
 
 from app.models.event_manager import Event
 from app.models.channels import EmailChannel, SMSChannel
-
+from app.models.exception import AppException
 from app.dtos.event_manager import CreateEvent
 
 from utils.logger import CustomLogger
@@ -33,9 +33,13 @@ class MongoEventManagerRepository(EventManagerRepository):
         try:
             event = await Event.get(id)
             if event is None or event.deleted_at is not None:
-                raise Exception("event not found")
+                raise AppException(
+                    status_code=404,
+                    message="event not found",
+                    detail="event_id provided is not valid. Please try again with a valid event_id",
+                )
             return event
-        except Exception as e:
+        except AppException as e:
             raise e
 
     # get_events returns a list of events and the total count based on the limit, offset and query

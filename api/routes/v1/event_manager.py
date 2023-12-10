@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Response
-from typing import Dict, Any
+from typing import Dict, Any, Union
 
 from app.services.event_manager import EventManagerService
 from app.dtos.event_manager import (
@@ -7,7 +7,10 @@ from app.dtos.event_manager import (
     CreateEventResponse,
     GetNotificationsResponse,
 )
+
+from app.models.event_manager import Event
 from app.models.notifications import NotificationStatus, Notification
+from app.models.exception import AppException, AppExceptionResponse
 
 # events_manager_router is an APIRouter object which will be used to define all the routes related to events
 events_manager_router = APIRouter()
@@ -18,7 +21,7 @@ events_manager_router = APIRouter()
     "/events", response_model=CreateEventResponse, response_model_exclude_none=True
 )
 async def create_event(
-    requestBody: CreateEvent,
+    requestBody: Union[CreateEvent, AppExceptionResponse],
     response: Response,
     event_service: EventManagerService = Depends(),
 ):
@@ -31,10 +34,13 @@ async def create_event(
             event=new_event, message="event created successfully"
         )
         return response_body
-    except Exception as e:
-        response.status_code = 500
-        response_body = CreateEventResponse(message=str(e), event=None)
-        return response_body
+    except AppException as e:
+        response.status_code = e.status_code
+
+        return AppExceptionResponse(
+            message=e.message,
+            detail=e.detail,
+        )
 
 
 @events_manager_router.get("/events")
@@ -51,12 +57,16 @@ async def get_events(
     try:
         event_details = await event_service.get_events(limit, offset, query)
         return event_details
-    except Exception as e:
-        response.status_code = 500
-        return {"message": str(e)}
+    except AppException as e:
+        response.status_code = e.status_code
+        return AppExceptionResponse(message=e.message, detail=e.detail)
 
 
-@events_manager_router.get("/events/{event_id}")
+@events_manager_router.get(
+    "/events/{event_id}",
+    response_model_exclude_none=True,
+    response_model=Union[Event, AppExceptionResponse],
+)
 async def get_event(
     response: Response,
     event_id: str,
@@ -68,12 +78,9 @@ async def get_event(
     try:
         event = await event_service.get_event_by_id(event_id)
         return event
-    except Exception as e:
-        if str(e) == "event not found":
-            response.status_code = 404
-        else:
-            response.status_code = 500
-        return {"message": f"{str(e)}"}
+    except AppException as e:
+        response.status_code = e.status_code
+        return AppExceptionResponse(message=e.message, detail=e.detail)
 
 
 @events_manager_router.put("/events/{event_id}")
