@@ -1,8 +1,11 @@
 from app.repositories.database import DatabaseService
+
 from utils.config import get_settings
 from utils.logger import CustomLogger
+
 from app.models.event_manager import Event
 from app.models.notifications import Notification
+from app.models.service_registration import ServiceRegistration
 
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
@@ -37,7 +40,8 @@ class MongoDBService(DatabaseService):
 
             self.client = AsyncIOMotorClient(mongo_url)
             await init_beanie(
-                self.client[settings.DB_NAME], document_models=[Event, Notification]
+                self.client[settings.DB_NAME],
+                document_models=[Event, Notification, ServiceRegistration],
             )
 
             self.logger.info("Connected to MongoDB")

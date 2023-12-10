@@ -16,6 +16,7 @@ from utils.logger import CustomLogger
 from utils.config import get_settings
 
 
+
 class EventManagerService:
     def __init__(self) -> None:
         settings = get_settings()
