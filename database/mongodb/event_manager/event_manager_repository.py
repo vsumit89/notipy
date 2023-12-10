@@ -32,8 +32,6 @@ class MongoEventManagerRepository(EventManagerRepository):
     async def get_event(self, id):
         try:
             event = await Event.get(id)
-            # if event is None:
-            #     raise Exception("event not found")
             if event is None or event.deleted_at is not None:
                 raise Exception("event not found")
             return event

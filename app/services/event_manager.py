@@ -1,8 +1,12 @@
 from app.repositories.event_manager.event_manager_factory import (
     get_event_manager_repository,
 )
-from app.dtos.event_manager import CreateEvent
+from app.repositories.notification.notifications_factory import (
+    get_notifications_repository,
+)
 
+from app.dtos.event_manager import CreateEvent, GetNotificationsResponse
+from app.models.notifications import NotificationStatus, Notification
 from app.services.notification_manager import NotificationManagerService
 
 from utils.logger import CustomLogger
@@ -14,6 +18,7 @@ class EventManagerService:
         settings = get_settings()
         self.repository = get_event_manager_repository(settings.DB_STORE)
         self.logger = CustomLogger(__name__)
+        self.notification_repository = get_notifications_repository(settings.DB_STORE)
 
     async def create_event(self, event: CreateEvent):
         try:
@@ -64,4 +69,24 @@ class EventManagerService:
             await notification_manager.send_notifications(event_id, dynamic_data)
 
         except Exception as e:
+            raise e
+
+    async def get_notifications(
+        self,
+        event_id: str,
+        limit: int,
+        offset: int,
+        status: NotificationStatus | None,
+    ) -> GetNotificationsResponse:
+        notification_details = await self.notification_repository.get_notifications(
+            event_id=event_id, limit=limit, offset=offset, status=status
+        )
+        return notification_details
+
+    async def get_notification(self, id) -> Notification:
+        try:
+            notification = await self.notification_repository.get_notification(id)
+            return notification
+        except Exception as e:
+            self.logger.error("error in fetching notification")
             raise e

@@ -2,7 +2,12 @@ from fastapi import APIRouter, Depends, Response
 from typing import Dict, Any
 
 from app.services.event_manager import EventManagerService
-from app.dtos.event_manager import CreateEvent, CreateEventResponse
+from app.dtos.event_manager import (
+    CreateEvent,
+    CreateEventResponse,
+    GetNotificationsResponse,
+)
+from app.models.notifications import NotificationStatus, Notification
 
 # events_manager_router is an APIRouter object which will be used to define all the routes related to events
 events_manager_router = APIRouter()
@@ -126,3 +131,52 @@ async def send_notifications(
     except Exception as e:
         response.status_code = 422
         return {"message": f"{str(e)}"}
+
+
+@events_manager_router.get(
+    "/events/{event_id}/get_notifications", response_model=GetNotificationsResponse
+)
+async def get_notifications(
+    response: Response,
+    event_id: str,
+    limit: int = 20,
+    offset: int = 0,
+    status: NotificationStatus = None,
+    event_service: EventManagerService = Depends(),
+):
+    """
+    Get all notifications for an event
+    """
+    try:
+        notifications = await event_service.get_notifications(
+            event_id=event_id,
+            limit=limit,
+            offset=offset,
+            status=status,
+        )
+        return notifications
+    except Exception as e:
+        response.status_code = 500
+        return {"message": f"{str(e)}"}
+
+
+@events_manager_router.get(
+    "/notifications/{notification_id}", response_model=Notification | Dict[str, Any]
+)
+async def get_notification(
+    response: Response,
+    notification_id: str,
+    event_service: EventManagerService = Depends(),
+):
+    """
+    Get a notification for an event
+    """
+    try:
+        notification = await event_service.get_notification(notification_id)
+        return notification
+    except Exception as e:
+        if str(e) == "notification not found":
+            response.status_code = 404
+        else:
+            response.status_code = 500
+        return {"message": f"Internal server error"}
