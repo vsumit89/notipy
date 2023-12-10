@@ -2,7 +2,7 @@
 
 A multichannel notification system built using FastAPI where users can create events and send notifications with dynamic data to these channels.
 
-## Architecture Overview
+## Architecture Overview and folder structure
 
 <!-- add an image -->
 
@@ -25,6 +25,24 @@ A multichannel notification system built using FastAPI where users can create ev
 - **Notification Dispatch**: Celery Worker listens for events from RabbitMQ and, upon receiving them, sends the notifications across the designated channels.
 - **Notification Status Tracking**: The Celery Worker updates the status of the notification in MongoDB, indicating whether the notification was successfully sent or not. This status can be used by the Notipy API to resend the notification if required.
 
+### Folder Structure
+
+```
+- api: contains the FastAPI http routes
+- app
+  - dtos : contains the data transfer objects using pydantic
+  - external: contains the code for external services like notification channels and event sources
+  - models: contains the beanie(object document mapper) and pydantic models
+  - repositories: contains abstractions for the database operations
+  - services: contains the business logic for the application which uses repositories, external services and models to perform the required operations
+  - validators: contains the validators for different models
+- database: contains the implementation of the repository abstractions
+- handy-scripts: some handy scripts for testing the application (not used in the application)
+- images: contains the images used in the README
+- utils: contains the utility functions
+- worker: contains the celery worker code
+```
+
 ## Setup
 
 ### Prerequisites
@@ -39,7 +57,7 @@ A multichannel notification system built using FastAPI where users can create ev
 - The API will be available at `http://localhost:8000`
 - The documentation will be available at `http://localhost:8000/docs`
 
-## Handy Commands from Makefile
+### Handy Commands from Makefile
 
 - `make build-and-run`: Build and run the containers
 - `make build`: Build the containers
