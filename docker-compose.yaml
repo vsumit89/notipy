@@ -16,6 +16,7 @@ services:
       "
     volumes:
       - .:/app
+      - ./volumes:/volumes:ro
     env_file:
       - .env
     networks:
