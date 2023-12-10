@@ -1,13 +1,18 @@
 from typing import Dict, Any
 
-from app.models.channels import EmailChannel, SMSChannel, ChannelType
 from app.repositories.notification.notifications_factory import (
     get_notifications_repository,
 )
+
 from utils.config import get_settings
 from utils.logger import CustomLogger
+
 from app.validators.notification_validator import NotificationValidator
+
 from app.models.notifications import Notification, NotificationStatus
+from app.models.exception import AppException
+from app.models.channels import EmailChannel, SMSChannel, ChannelType
+
 from worker.send_notification import send_notifications
 
 
@@ -49,7 +54,7 @@ class NotificationManagerService:
                         channel_data,
                         dynamic_data[ChannelType.SMS.value],
                     )
-        except Exception as e:
+        except AppException as e:
             raise e
 
     async def _send_email_notification(
@@ -73,9 +78,7 @@ class NotificationManagerService:
                     dynamic_data,
                 ]
             )
-        except Exception as e:
-            print("this is an exception", str(e))
-
+        except AppException as e:
             raise e
 
     async def _send_sms_notification(
@@ -99,5 +102,5 @@ class NotificationManagerService:
                     await self._send_sms_notification(
                         event_id, channel_data, dynamic_data[ChannelType.SMS.value]
                     )
-        except Exception as e:
+        except AppException as e:
             raise e
