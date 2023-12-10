@@ -83,7 +83,9 @@ async def get_event(
         return AppExceptionResponse(message=e.message, detail=e.detail)
 
 
-@events_manager_router.put("/events/{event_id}")
+@events_manager_router.put(
+    "/events/{event_id}", response_class=Union[Event, AppExceptionResponse]
+)
 async def update_event(
     request_body: CreateEvent,
     response: Response,
@@ -96,9 +98,9 @@ async def update_event(
     try:
         updated_event = await event_service.update_event(event_id, request_body)
         return updated_event
-    except:
-        response.status_code = 500
-        return {"message": f"unable to update event {event_id}"}
+    except AppException as e:
+        response.status_code = e.status_code
+        return AppExceptionResponse(message=e.message, detail=e.detail)
 
 
 @events_manager_router.delete("/events/{event_id}")
@@ -122,7 +124,9 @@ async def delete_event(
         return {"message": f"{str(e)}"}
 
 
-@events_manager_router.post("/events/{event_id}/send_notifications")
+@events_manager_router.post(
+    "/events/{event_id}/send_notifications",
+)
 async def send_notifications(
     requestBody: Dict[str, Any],
     response: Response,
@@ -135,9 +139,9 @@ async def send_notifications(
     try:
         await event_service.initiate_notifications(event_id, requestBody)
         return {"message": "notification has been queued successfully for delivery"}
-    except Exception as e:
-        response.status_code = 422
-        return {"message": f"{str(e)}"}
+    except AppException as e:
+        response.status_code = e.status_code
+        return AppExceptionResponse(message=e.message, detail=e.detail)
 
 
 @events_manager_router.get(
@@ -168,7 +172,8 @@ async def get_notifications(
 
 
 @events_manager_router.get(
-    "/notifications/{notification_id}", response_model=Notification | Dict[str, Any]
+    "/notifications/{notification_id}",
+    response_model=Union[Notification, AppExceptionResponse],
 )
 async def get_notification(
     response: Response,
@@ -181,9 +186,6 @@ async def get_notification(
     try:
         notification = await event_service.get_notification(notification_id)
         return notification
-    except Exception as e:
-        if str(e) == "notification not found":
-            response.status_code = 404
-        else:
-            response.status_code = 500
-        return {"message": f"Internal server error"}
+    except AppException as e:
+        response.status_code = e.status_code
+        return AppExceptionResponse(message=e.message, detail=e.detail)

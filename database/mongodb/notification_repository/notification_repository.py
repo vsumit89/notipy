@@ -28,8 +28,7 @@ class MongoNotificationRepository(NotificationsRepository):
         try:
             new_notification = await Notification.insert(notification)
             return new_notification
-        except Exception as e:
-            print("this is the error")
+        except AppException as e:
             raise e
 
     async def update_notification_status(self, id, status: NotificationStatus):
@@ -37,7 +36,7 @@ class MongoNotificationRepository(NotificationsRepository):
             notification = await Notification.get(id)
             await notification.set({Notification.status: status})
 
-        except Exception as e:
+        except AppException as e:
             raise e
 
     async def get_notifications(
