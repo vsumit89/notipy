@@ -26,6 +26,10 @@ celery_app = Celery(
     broker=f"amqp://{settings.MQ_USERNAME}:{settings.MQ_PASSWORD}@{settings.MQ_HOST}:{settings.MQ_PORT}/{settings.MQ_VHOST}",
 )
 
+celery_app.conf.update(
+    CELERY_ACKS_LATE=True,
+)
+
 
 async def update_notification_status(notification_id: str, status: str):
     try:

@@ -97,8 +97,8 @@ def send_simple_message(html_content):
 
 
 # Replace these with your Mailgun API key, domain, and other details
-api_key = "b12fc7ca061fd71b92da9e028d293b3f-0a688b4a-3679d9ea"
-domain = "sandboxf025f1c5362f47f39394e138b9a67081.mailgun.org"
+api_key = "api_key"
+domain = "domain"
 to_email = "vsumit030201@gmail.com"
 email_subject = "Test Email"
 email_text = "Hello, this is the email body."
