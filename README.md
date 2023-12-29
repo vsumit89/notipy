@@ -51,8 +51,8 @@ A multichannel notification system built using FastAPI where users can create ev
 
 ### Steps
 
-- Clone the repository using `git clone https://github.com/vsumit/wareiq-assg`
-- Navigate to the project directory using `cd wareiq-assg`
+- Clone the repository using `git clone https://github.com/vsumit/notipy`
+- Navigate to the project directory using `cd notipy`
 - Create a `.env` file in the root directory and copy the contents of `.env.example` to it
 - Run `docker-compose up --build` to build and run the containers
 - The API will be available at `http://localhost:8000`
